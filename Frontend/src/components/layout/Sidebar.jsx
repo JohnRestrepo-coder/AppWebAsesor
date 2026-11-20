@@ -1,14 +1,12 @@
-// src/components/layout/Sidebar.jsx
 import React from 'react';
 import logoWWB from '../../assets/logo_fundacion_wwb_colombia.png';
 
-export default function Sidebar({ seccionActiva, onNavigate }) {
+export default function Sidebar({ seccionActiva, onNavigate, onAbrirMinuta }) {
   const menuItems = [
-    { id: 'panel', label: '📊 Panel de Control', disabled: true },
-    { id: 'empresarios', label: '👥 Empresarios', disabled: false },
-    { id: 'sesiones', label: '📅 Sesiones de Asesoría', disabled: true },
-    { id: 'asistente', label: '✨ Asistente IA', disabled: true },
-    { id: 'reportes', label: '📈 Reportes', disabled: true },
+    { id: 'empresarios', label: '👥 Expedientes', disabled: false },
+    { id: 'sesiones', label: '🎙️ Minuta de Asesoría', disabled: false, action: onAbrirMinuta },
+    { id: 'panel', label: '📊 Métricas de Impacto', disabled: true },
+    { id: 'reportes', label: '📈 Reportes WWB', disabled: true },
     { id: 'configuracion', label: '⚙️ Configuración', disabled: true },
   ];
 
@@ -31,8 +29,20 @@ export default function Sidebar({ seccionActiva, onNavigate }) {
         </div>
         <div className="text-truncate">
           <div className="small fw-bold lh-1">Carlos Gómez</div>
-          <small className="opacity-75" style={{ fontSize: '0.7rem' }}>Consultor Senior</small>
+          <small className="opacity-75" style={{ fontSize: '0.7rem' }}>Consultor Empresarial</small>
         </div>
+      </div>
+
+      {/* BOTÓN RÁPIDO PARA MINUTA DE VOZ */}
+      <div className="mb-3">
+        <button
+          onClick={onAbrirMinuta}
+          className="btn btn-warning w-100 fw-bold d-flex align-items-center justify-content-center gap-2 rounded-pill py-2 text-dark shadow-sm"
+          style={{ fontSize: '0.8rem', backgroundColor: 'var(--wwb-amarillo)' }}
+        >
+          <span>🎙️</span>
+          <span>Grabar Minuta de Voz</span>
+        </button>
       </div>
 
       {/* MENÚ DE NAVEGACIÓN SPA */}
@@ -40,13 +50,20 @@ export default function Sidebar({ seccionActiva, onNavigate }) {
         {menuItems.map((item) => (
           <li key={item.id} className="nav-item">
             <button
-              onClick={() => !item.disabled && onNavigate(item.id)}
+              onClick={() => {
+                if (item.action) {
+                  item.action();
+                } else if (!item.disabled) {
+                  onNavigate(item.id);
+                }
+              }}
               className={`nav-link w-100 text-start text-white border-0 d-flex justify-content-between align-items-center ${
                 seccionActiva === item.id ? 'fw-bold' : 'opacity-75'
               }`}
               style={{
                 backgroundColor: seccionActiva === item.id ? 'var(--wwb-azul-hover)' : 'transparent',
-                cursor: item.disabled ? 'not-allowed' : 'pointer'
+                cursor: item.disabled ? 'not-allowed' : 'pointer',
+                fontSize: '0.85rem'
               }}
             >
               <span>{item.label}</span>
@@ -60,10 +77,10 @@ export default function Sidebar({ seccionActiva, onNavigate }) {
         ))}
       </ul>
 
-      {/* BOTÓN / BANNER DE RECOMENDACIONES IA */}
+      {/* PIE DE SIDEBAR CON IDENTIFICADOR DE METODOLOGÍA */}
       <div className="pt-3 border-top border-white border-opacity-10">
-        <div className="p-2 rounded text-center fw-bold text-dark" style={{ backgroundColor: 'var(--wwb-amarillo)', fontSize: '0.75rem' }}>
-          💡 RECOMENDACIONES IA
+        <div className="p-2 rounded text-center fw-bold text-dark" style={{ backgroundColor: 'var(--wwb-amarillo)', fontSize: '0.72rem' }}>
+          ✨ ASISTENTE WWB V3
         </div>
       </div>
     </aside>

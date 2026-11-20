@@ -81,4 +81,35 @@ INSTRUCCIONES DE RESPUESTA:
   3. 🎯 Compromiso Sugerido para la Próxima Sesión
 """
 
+    @classmethod
+    def build_voice_minute_prompt(
+        cls,
+        nombre_empresario: str,
+        empresa: str,
+        texto_dictado: str
+    ) -> str:
+        return f"""
+Actúa como el Asistente Inteligente de Consultoría de la Fundación WWB Colombia.
+A continuación tienes la transcripción del dictado de voz de la sesión de asesoría con el microempresario {nombre_empresario} ({empresa}):
+
+"{texto_dictado}"
+
+TU TAREA:
+Analiza la conversación y responde ÚNICAMENTE con un objeto JSON válido con la siguiente estructura exacta:
+{{
+  "resumen_sesion": "Resumen claro de 2 o 3 oraciones sobre lo tratado en la sesión y el estado del negocio.",
+  "tareas_consultor": [
+    "Tarea específica que debe realizar el consultor antes de la próxima asesoría."
+  ],
+  "tareas_empresario": [
+    "Tarea concreta, medible y alcanzable a 7 días que debe cumplir el microempresario."
+  ]
+}}
+
+REGLAS OBLIGATORIAS:
+1. Divide claramente las tareas: las del consultor son metodológicas/preparación; las del microempresario son operativas/financieras del negocio.
+2. Cada tarea del empresario debe formularse con verbos de acción claros (ej: 'Registrar todas las ventas de la semana', 'Cotizar materia prima con dos proveedores').
+3. No agregues texto introductorio ni explicaciones fuera del bloque JSON. Solo el JSON.
+"""
+
 prompt_service = PromptService()

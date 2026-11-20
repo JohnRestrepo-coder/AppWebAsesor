@@ -2,15 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
-    from app.api import empresarios, ia
+    from app.api import empresarios, ia, minutas
     from app.config.settings import settings
 except ImportError:
-    from api import empresarios, ia
+    from api import empresarios, ia, minutas
     from config.settings import settings
 
 app = FastAPI(
     title="Backend Consultor WWB - Asistente Inteligente de Consultoría",
-    description="API para la gestión de expedientes de microempresarios y asistencia IA (Fundación WWB Colombia)",
+    description="API para la gestión de expedientes de microempresarios, asistencia IA y minutas de voz (Fundación WWB Colombia)",
     version="1.0.0"
 )
 
@@ -26,6 +26,7 @@ app.add_middleware(
 # Registro de Routers Modulares
 app.include_router(empresarios.router)
 app.include_router(ia.router)
+app.include_router(minutas.router)
 
 @app.get("/", tags=["General"])
 def root():
