@@ -55,12 +55,10 @@ export const obtenerEmpresarios = async (force = false) => {
     const url = force ? `${API_BASE_URL}/empresarios?force=true` : `${API_BASE_URL}/empresarios`;
     const response = await axios.get(url, { timeout: 6000 });
     
-    // Si el backend devuelve SincronizacionResponse
     if (response.data && response.data.empresarios) {
       return response.data;
     }
     
-    // Si devuelve un arreglo directo
     if (Array.isArray(response.data)) {
       return {
         drive_status: "connected",
@@ -107,18 +105,20 @@ export const obtenerEmpresarioPorId = async (id) => {
   }
 };
 
-export const consultarIA = async (empresarioId, pregunta) => {
+export const consultarIA = async (empresarioId, pregunta, tipoAnalisis = "general") => {
   try {
     const response = await axios.post(`${API_BASE_URL}/consulta-ia`, {
       empresario_id: String(empresarioId),
-      pregunta: pregunta
-    }, { timeout: 8000 });
+      pregunta: pregunta,
+      tipo_analisis: tipoAnalisis
+    }, { timeout: 12000 });
     return response.data;
   } catch (error) {
-    console.warn('⚠️ Error en endpoint IA, usando respuesta simulada:', error.message);
+    console.warn('⚠️ Error en endpoint IA, usando respuesta de contingencia:', error.message);
     return {
-      respuesta: `🤖 [Asistente WWB - Modo Local]\n\nAnálisis para la consulta "${pregunta}":\nSe recomienda validar en la bitácora la separación de cuentas personales y del negocio, y definir una meta de ventas para la próxima semana.`,
-      status: "mock"
+      respuesta: `### 📌 Diagnóstico Clave\nConsulta procesada en modo contingencia para el microempresario.\n\n### 💡 Recomendación Práctica\n1. Validar la separación de gastos personales del negocio.\n2. Establecer meta semanal de ventas para la siguiente sesión.\n\n### 🎯 Compromiso Sugerido\n* Traer el registro de ingresos y gastos de la semana.`,
+      status: "mock",
+      tipo_analisis: tipoAnalisis
     };
   }
 };
