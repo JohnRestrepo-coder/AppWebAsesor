@@ -1,33 +1,46 @@
 import React, { useState } from 'react';
 import QuickPrompts from './QuickPrompts';
+import { consultarIA } from '../../services/empresarioService';
 
 export default function ChatPanel({ empresario }) {
   const [pregunta, setPregunta] = useState('');
+  const [cargando, setCargando] = useState(false);
   const [historial, setHistorial] = useState([
     {
       rol: 'ia',
-      texto: `Estrategias de Fidelización Recomendadas:\n\nBasado en la bitácora de ${empresario?.nombre || 'empresario'}, se recomienda implementar un programa de puntos simple y seguimiento post-venta vía WhatsApp para mejorar la retención de clientes.`
+      texto: `¡Hola! Soy el Asistente Inteligente de Consultoría de la Fundación WWB Colombia.\n\nHe cargado el contexto del expediente de **${empresario?.nombre || 'empresario'}**. ¿En qué área de la asesoría deseas enfocarte hoy?`
     }
   ]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e?.preventDefault();
-    if (!pregunta.trim()) return;
+    if (!pregunta.trim() || cargando) return;
 
-    setHistorial(prev => [...prev, { rol: 'consultor', texto: pregunta }]);
-    const currentQ = pregunta;
+    const textoPregunta = pregunta;
+    setHistorial(prev => [...prev, { rol: 'consultor', texto: textoPregunta }]);
     setPregunta('');
+    setCargando(true);
 
-    // Respuesta simulada para desarrollo visual UI
-    setTimeout(() => {
+    try {
+      const data = await consultarIA(empresario?.id || empresario?.cedula || '1', textoPregunta);
       setHistorial(prev => [
         ...prev,
         {
           rol: 'ia',
-          texto: `🤖 [Asistente Inteligente de Consultoría]\n\nRespuesta contextualizada para **${empresario?.nombre}** sobre: "${currentQ}".\n\n1. Validar margen bruto en Excel.\n2. Establecer metas de venta semanal.`
+          texto: data.respuesta || "Respuesta generada por el asistente."
         }
       ]);
-    }, 800);
+    } catch (err) {
+      setHistorial(prev => [
+        ...prev,
+        {
+          rol: 'ia',
+          texto: `⚠️ Error al procesar la consulta: ${err.message}`
+        }
+      ]);
+    } finally {
+      setCargando(false);
+    }
   };
 
   const handleQuickPrompt = (promptText) => {
@@ -35,22 +48,22 @@ export default function ChatPanel({ empresario }) {
   };
 
   return (
-    <div className="wwb-card d-flex flex-column h-100">
+    <div className="card border-0 shadow-sm h-100 d-flex flex-column">
       {/* Header Chat */}
-      <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
+      <div className="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
           <h6 className="fw-bold mb-0" style={{ color: 'var(--wwb-azul)' }}>
             ✨ Asistente Inteligente de Consultoría
           </h6>
           <small className="text-muted" style={{ fontSize: '0.7rem' }}>
-            Impulsado por Gemini · Contexto del empresario cargado automáticamente.
+            Fundación WWB Colombia · Contexto del empresario activo
           </small>
         </div>
-        <span className="badge bg-primary bg-opacity-10 text-primary">Gemini 2.5</span>
+        <span className="badge bg-primary bg-opacity-10 text-primary">Gemini AI</span>
       </div>
 
       {/* Historial */}
-      <div className="flex-grow-1 bg-light p-3 overflow-auto" style={{ minHeight: '300px', maxHeight: '450px' }}>
+      <div className="card-body bg-light p-3 flex-grow-1 overflow-auto" style={{ minHeight: '340px', maxHeight: '420px' }}>
         {historial.map((msg, i) => (
           <div
             key={i}
@@ -69,10 +82,16 @@ export default function ChatPanel({ empresario }) {
             {msg.texto}
           </div>
         ))}
+        {cargando && (
+          <div className="p-3 bg-white rounded border-start border-4 border-warning shadow-sm small text-muted" style={{ maxWidth: '60%' }}>
+            <span className="spinner-border spinner-border-sm me-2 text-warning" role="status" />
+            Gemini está analizando la bitácora...
+          </div>
+        )}
       </div>
 
       {/* Footer Controles */}
-      <div className="p-3 border-top bg-white">
+      <div className="card-footer bg-white border-0 p-3">
         <QuickPrompts onSelectPrompt={handleQuickPrompt} />
         <form onSubmit={handleSend} className="input-group">
           <input
@@ -81,10 +100,16 @@ export default function ChatPanel({ empresario }) {
             placeholder="Escriba su consulta específica sobre el empresario..."
             value={pregunta}
             onChange={(e) => setPregunta(e.target.value)}
+            disabled={cargando}
             style={{ fontSize: '0.875rem' }}
           />
-          <button className="btn text-white" type="submit" style={{ backgroundColor: 'var(--wwb-azul)' }}>
-            Enviar
+          <button 
+            className="btn text-white px-4" 
+            type="submit" 
+            disabled={cargando || !pregunta.trim()}
+            style={{ backgroundColor: 'var(--wwb-azul)' }}
+          >
+            {cargando ? 'Consultando...' : 'Enviar'}
           </button>
         </form>
       </div>

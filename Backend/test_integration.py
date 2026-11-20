@@ -1,16 +1,15 @@
-# backend/test_integration.py
 import sys
 import os
 
 # ==============================================================================
-# RESOLUCIÓN DE RUTAS DEL SISTEMA (Resuelve ModuleNotFoundError: No module named 'services')
+# RESOLUCIÓN DE RUTAS DEL SISTEMA (Importaciones desde app.*)
 # ==============================================================================
-DIRECTORIO_ACTUAL = os.path.dirname(os.path.abspath(__file__))
-if DIRECTORIO_ACTUAL not in sys.path:
-    sys.path.insert(0, DIRECTORIO_ACTUAL)
+DIRECTORIO_BACKEND = os.path.dirname(os.path.abspath(__file__))
+if DIRECTORIO_BACKEND not in sys.path:
+    sys.path.insert(0, DIRECTORIO_BACKEND)
 
-from services.drive_service import drive_service
-from services.excel_service import excel_service
+from app.services.drive_service import drive_service
+from app.services.excel_service import excel_service
 
 def probar_conexion_y_parseo():
     print("=" * 60)
