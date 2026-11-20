@@ -1,0 +1,154 @@
+Yo empezaría exactamente igual que lo hace un equipo profesional de desarrollo: primero diseñamos la experiencia del usuario (UX/UI) y después escribimos una sola línea de código.
+
+En este momento ya tenemos algo muy valioso: sabemos qué problema queremos resolver y cómo debe sentirse la aplicación. Ahora toca convertir esa idea en un diseño concreto.
+
+Fase 1. Diseñar la interfaz (2-3 días)
+
+No programamos nada todavía.
+
+Diseñamos la pantalla completa.
+
+Definimos exactamente:
+
+ubicación de cada elemento
+tamaños
+colores
+iconos
+tipografía
+comportamiento de cada botón
+comportamiento de la búsqueda
+animaciones
+
+Al terminar esta fase deberíamos tener una imagen como si la aplicación ya existiera.
+
+Algo parecido a esto:
+
++--------------------------------------------------------------+
+| LOGO WWB                     Buscar empresario...            |
++-----------+--------------------------------------------------+
+| Sidebar   | Empresario Activo                               |
+|           |--------------------------------------------------|
+| Inicio    | Perfil                                           |
+| Empres... |--------------------------------------------------|
+| Sesiones  | Diagnóstico                                      |
+| IA        |--------------------------------------------------|
+| Reportes  | Problemáticas                                    |
+|           |--------------------------------------------------|
+|           | Asistente Inteligente de Consultoría             |
+|           |                                                  |
+|           | Chat                                             |
+|           |                                                  |
++-----------+--------------------------------------------------+
+
+Cuando estemos satisfechos, recién ahí comenzamos a programar.
+
+Fase 2. Construir el Layout
+
+Aquí todavía no conectamos ninguna API.
+
+Solo hacemos que React muestre la pantalla.
+
+Tareas:
+
+✅ Sidebar
+
+✅ Header
+
+✅ Barra de búsqueda
+
+✅ Tarjetas
+
+✅ Área del chat
+
+Todo usando Bootstrap personalizado.
+
+Nada de datos reales.
+
+Fase 3. Buscar empresarios
+
+Ahora conectamos con FastAPI.
+
+Tu backend ya tiene este endpoint:
+
+GET /api/empresarios
+
+y devuelve algo como:
+
+[
+   {
+      "id":"80442045",
+      "nombre":"Raul Hernan Ortiz",
+      ...
+   }
+]
+
+Ese endpoint ya existe en tu proyecto.
+
+React simplemente lo consumirá.
+
+Fase 4. Autocompletado
+
+Ahora hacemos que funcione:
+
+Buscar...
+
+ma
+
+↓
+
+María Yepes
+
+María Rodríguez
+
+Marcos López
+
+Sin botones.
+
+Todo en tiempo real.
+
+Fase 5. Empresario activo
+
+Cuando el usuario hace clic:
+
+María Rodríguez
+
+React guarda:
+
+empresarioActivo
+
+Y automáticamente cambia:
+
+Perfil
+Diagnóstico
+Archivo
+Chat
+
+Sin cambiar de página.
+
+Fase 6. Chat IA
+
+Aquí ya usamos el endpoint:
+
+POST /consulta-ia
+
+que también ya tienes preparado en FastAPI.
+
+Fase 7. Botones inteligentes
+
+Los botones rápidos simplemente llenan un prompt.
+
+Por ejemplo:
+
+Analizar ventas
+
+envía:
+
+Analiza las ventas del empresario utilizando el contenido completo de la bitácora.
+Fase 8. Mejoras
+
+Después vendrían:
+
+Voz
+WhatsApp
+Historial
+Reportes

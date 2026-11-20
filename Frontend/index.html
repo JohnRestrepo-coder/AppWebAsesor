@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultor IA — Fundación WWB Colombia</title>
+
+  <!-- 1. Estilos CDN: Bootstrap 5, Icons & Tipografía Inter -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 2. Librerías CDN: React 18, ReactDOM y Babel Transpiler -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 3. Variables CSS Oficiales y Estilos Globales (Sin CSS Inline excesivo) -->
+  <style>
+    :root {
+      --wwb-azul: #1D327D;
+      --wwb-azul-hover: #2b479d;
+      --wwb-amarillo: #F0AD15;
+      --bg-app: #f4f6f9;
+      --sidebar-width: 280px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-app);
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Layout SPA general */
+    .app-viewport { display: flex; width: 100vw; height: 100vh; }
+    .sidebar-wwb { width: var(--sidebar-width); background-color: var(--wwb-azul); flex-shrink: 0; }
+    .content-area { flex-grow: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .workspace-scroll { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+    .card-wwb { background: #fff; border: 1px solid #e9ecef; border-radius: 0.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.04); }
+    
+    /* Branding Sidebar */
+    .sidebar-brand-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sidebar-logo {
+      max-width: 190px;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nodo Raíz para React -->
+  <div id="root"></div>
+
+  <!-- Script React transpilado por Babel -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    // --- DATOS MOCK (Sincronizados con los archivos reales de Google Drive) ---
+    const EMPRESARIOS_BASE = [
+      { id: "29740252", cedula: "29740252", nombre: "MARÍA ISABEL YEPES ASCENSIO", archivo: "Bitacora 29740252 MARIA ISABEL YEPES ASCENSIO.xlsx", negocio: "Confecciones El Sol", sector: "Textil" },
+      { id: "80442045", cedula: "80442045", nombre: "RAÚL HERNÁN ORTIZ BELTRÁN", archivo: "Bitacora 80442045 RAUL HERNAN ORTIZ BELTRAN.xlsx", negocio: "Muebles Ortiz", sector: "Madera" },
+      { id: "1007706965", cedula: "1007706965", nombre: "STEFANNY BERNAL BENAVIDES", archivo: "Bitacora 1007706965 STEFANNY BERNAL BENAVIDES.xlsx", negocio: "Detalles Stefanny", sector: "Artesanías" }
+    ];
+
+    function App() {
+      const [seccionActiva, setSeccionActiva] = useState('empresarios');
+      const [empresarioActivo, setEmpresarioActivo] = useState(EMPRESARIOS_BASE[0]);
+      const [busqueda, setBusqueda] = useState('');
+      const [mensaje, setMensaje] = useState('');
+      const [historial, setHistorial] = useState([
+        {
+          rol: 'ia',
+          texto: `Estrategias de Fidelización Recomendadas:\n\nBasado en la bitácora de ${EMPRESARIOS_BASE[0].nombre}, se recomienda implementar un programa de puntos simple y seguimiento post-venta vía WhatsApp para mejorar la retención de clientes.`
+        }
+      ]);
+
+      // Filtrado para autocompletado en tiempo real
+      const resultadosBusqueda = busqueda.trim() === '' ? [] : EMPRESARIOS_BASE.filter(emp =>
+        emp.nombre.toLowerCase().includes(busqueda.toLowerCase()) || emp.cedula.includes(busqueda)
+      );
+
+      const handleEnviar = (textoEnvio) => {
+        const query = textoEnvio || mensaje;
+        if (!query.trim()) return;
+
+        const nuevoHistorial = [...historial, { rol: 'consultor', texto: query }];
+        setHistorial(nuevoHistorial);
+        setMensaje('');
+
+        // Simulación de interacción con la API de FastAPI / Gemini
+        setTimeout(() => {
+          setHistorial([
+            ...nuevoHistorial,
+            {
+              rol: 'ia',
+              texto: `🤖 [Asistente Inteligente de Consultoría]\n\nAnálisis procesado para **${empresarioActivo.nombre}** sobre "${query}":\n\n1. Validar margen de contribución en la bitácora individual.\n2. Establecer separación de cuentas personales y del negocio en la cédula ${empresarioActivo.cedula}.`
+            }
+          ]);
+        }, 500);
+      };
+
+      return (
+        <div className="app-viewport">
+          
+          {/* BARRA LATERAL (Sidebar) */}
+          <aside className="sidebar-wwb p-3 text-white d-flex flex-column">
+            
+            {/* LOGO OFICIAL FUNDACIÓN WWB COLOMBIA */}
+            <div className="sidebar-brand-container">
+              <img 
+                src="./src/assets/logo_fundacion_wwb_colombia.png" 
+                alt="Fundación WWB Colombia" 
+                className="sidebar-logo mb-1" 
+              />
+            </div>
+
+            {/* PERFIL DEL CONSULTOR */}
+            <div className="p-2 mb-3 rounded bg-white bg-opacity-10 d-flex align-items-center gap-2">
+              <div className="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center fw-bold" style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}>
+                JR
+              </div>
+              <div className="text-truncate">
+                <div className="small fw-bold lh-1">John Restrepo Aparicio</div>
+                <small className="opacity-75" style={{ fontSize: '0.7rem' }}>Consultor Senior</small>
+              </div>
+            </div>
+
+            {/* NAVEGACIÓN SPA */}
+            <ul className="nav nav-pills flex-column mb-auto gap-1">
+              <li><button className="nav-link w-100 text-start text-white opacity-50 border-0" disabled>📊 Panel de Control <span className="badge bg-secondary float-end" style={{ fontSize: '0.5rem' }}>Próximamente</span></button></li>
+              <li><button className="nav-link w-100 text-start text-white active fw-bold border-0" style={{ backgroundColor: 'var(--wwb-azul-hover)' }}>👥 Empresarios</button></li>
+              <li><button className="nav-link w-100 text-start text-white opacity-50 border-0" disabled>📅 Sesiones <span className="badge bg-secondary float-end" style={{ fontSize: '0.5rem' }}>Próximamente</span></button></li>
+              <li><button className="nav-link w-100 text-start text-white opacity-50 border-0" disabled>✨ Asistente IA <span className="badge bg-secondary float-end" style={{ fontSize: '0.5rem' }}>Próximamente</span></button></li>
+            </ul>
+
+            <div className="mt-auto pt-3 border-top border-white border-opacity-10">
+              <div className="p-2 rounded text-center fw-bold text-dark" style={{ backgroundColor: 'var(--wwb-amarillo)', fontSize: '0.75rem' }}>
+                💡 RECOMENDACIONES IA
+              </div>
+            </div>
+          </aside>
+
+          {/* ÁREA DE TRABAJO */}
+          <div className="content-area">
+            
+            {/* HEADER SUPERIOR CON AUTOCOMPLETADO */}
+            <header className="bg-white border-bottom px-4 py-2 d-flex justify-content-between align-items-center shadow-sm position-relative" style={{ height: '60px' }}>
+              <div className="w-50 position-relative">
+                <input 
+                  type="text" 
+                  className="form-control bg-light border-0 rounded-pill px-3"
+                  placeholder="🔍 Buscar empresario por nombre o cédula..."
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  style={{ fontSize: '0.875rem' }}
+                />
+
+                {/* Desplegable Autocompletado */}
+                {resultadosBusqueda.length > 0 && (
+                  <div className="position-absolute top-100 start-0 w-100 bg-white border rounded-3 shadow-lg mt-1 z-3 overflow-hidden">
+                    {resultadosBusqueda.map(emp => (
+                      <button
+                        key={emp.id}
+                        className="w-100 text-start p-2 border-0 bg-white d-flex justify-content-between align-items-center border-bottom"
+                        onClick={() => {
+                          setEmpresarioActivo(emp);
+                          setBusqueda('');
+                        }}
+                      >
+                        <span className="fw-bold small">{emp.nombre}</span>
+                        <small className="text-muted">CC: {emp.cedula}</small>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <span className="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2" style={{ fontSize: '0.75rem' }}>
+                ● Google Drive Conectado
+              </span>
+            </header>
+
+            {/* CONTENIDO PRINCIPAL */}
+            <main className="workspace-scroll">
+              <div className="mb-3">
+                <h4 className="fw-bold mb-1" style={{ color: 'var(--wwb-azul)' }}>
+                  Análisis IA y Recomendaciones para: {empresarioActivo.nombre}
+                </h4>
+                <small className="text-muted">Cédula: {empresarioActivo.cedula} | Archivo: <code>{empresarioActivo.archivo}</code></small>
+              </div>
+
+              <div className="row g-3">
+                {/* COLUMNA IZQUIERDA: TARJETAS DEL EMPRESARIO */}
+                <div className="col-lg-4 d-flex flex-column gap-3">
+                  <div className="card-wwb p-3">
+                    <span className="badge text-dark mb-2 w-auto align-self-start" style={{ backgroundColor: 'var(--wwb-amarillo)', fontSize: '0.7rem' }}>Empresario Activo</span>
+                    <h5 className="fw-bold mb-1" style={{ color: 'var(--wwb-azul)' }}>{empresarioActivo.nombre}</h5>
+                    <small className="text-muted">{empresarioActivo.negocio}</small>
+                    <hr className="my-2"/>
+                    <small className="text-secondary"><strong>Sector:</strong> {empresarioActivo.sector}</small>
+                  </div>
+
+                  <div className="card-wwb p-3">
+                    <h6 className="fw-bold mb-2" style={{ color: 'var(--wwb-azul)' }}>📋 Diagnóstico de Bitácora</h6>
+                    <ul className="list-unstyled small mb-0 d-flex flex-column gap-1">
+                      <li className="text-success">✔ Estructura de costos inicial registrada.</li>
+                      <li className="text-warning">⚠ Mezcla de finanzas personales.</li>
+                      <li className="text-danger">✖ Sin canal digital formal.</li>
+                    </ul>
+                  </div>
+
+                  <div className="card-wwb p-3">
+                    <h6 className="fw-bold mb-2" style={{ color: 'var(--wwb-azul)' }}>⚠️ Problemáticas Clave</h6>
+                    <div className="d-flex flex-wrap gap-1">
+                      <span className="badge bg-light text-dark border">Ventas Digitales</span>
+                      <span className="badge bg-light text-dark border">Cadena de Suministro</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* COLUMNA DERECHA: ASISTENTE INTELIGENTE DE CONSULTORÍA */}
+                <div className="col-lg-8">
+                  <div className="card-wwb h-100 d-flex flex-column">
+                    
+                    {/* Header del Asistente */}
+                    <div className="p-3 border-bottom d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 className="fw-bold mb-0" style={{ color: 'var(--wwb-azul)' }}>✨ Asistente Inteligente de Consultoría</h6>
+                        <small className="text-muted" style={{ fontSize: '0.7rem' }}>Impulsado por Gemini · Contexto del empresario cargado automáticamente.</small>
+                      </div>
+                      <span className="badge bg-primary bg-opacity-10 text-primary">Gemini 2.5</span>
+                    </div>
+
+                    {/* Historial de Mensajes */}
+                    <div className="bg-light p-3 flex-grow-1 overflow-auto" style={{ maxHeight: '380px' }}>
+                      {historial.map((m, i) => (
+                        <div 
+                          key={i} 
+                          className={`p-3 rounded mb-2 shadow-sm ${m.rol === 'consultor' ? 'bg-primary text-white ms-auto' : 'bg-white text-dark border-start border-4'}`}
+                          style={{ maxWidth: '85%', borderLeftColor: m.rol === 'ia' ? 'var(--wwb-amarillo)' : 'transparent', fontSize: '0.85rem', whiteSpace: 'pre-line' }}
+                        >
+                          {m.texto}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer con Prompts Rápidos y Caja de Texto */}
+                    <div className="p-3 border-top bg-white">
+                      <div className="d-flex gap-1 overflow-auto pb-2 mb-2">
+                        <button onClick={() => handleEnviar('📊 Analizar ventas')} className="btn btn-outline-secondary btn-sm text-nowrap rounded-pill" style={{ fontSize: '0.75rem' }}>📊 Analizar ventas</button>
+                        <button onClick={() => handleEnviar('📋 Preparar próxima asesoría')} className="btn btn-outline-secondary btn-sm text-nowrap rounded-pill" style={{ fontSize: '0.75rem' }}>📋 Preparar próxima asesoría</button>
+                        <button onClick={() => handleEnviar('🎯 Generar plan de acción')} className="btn btn-outline-secondary btn-sm text-nowrap rounded-pill" style={{ fontSize: '0.75rem' }}>🎯 Generar plan de acción</button>
+                        <button onClick={() => handleEnviar('⚠️ Encontrar riesgos')} className="btn btn-outline-secondary btn-sm text-nowrap rounded-pill" style={{ fontSize: '0.75rem' }}>⚠️ Encontrar riesgos</button>
+                      </div>
+
+                      <form onSubmit={(e) => { e.preventDefault(); handleEnviar(); }} className="input-group">
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          placeholder="Escriba su consulta específica sobre el empresario..." 
+                          value={mensaje}
+                          onChange={(e) => setMensaje(e.target.value)}
+                        />
+                        <button className="btn text-white px-4" type="submit" style={{ backgroundColor: 'var(--wwb-azul)' }}>
+                          Enviar
+                        </button>
+                      </form>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      );
+    }
+
+    // Renderizado del componente raíz
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

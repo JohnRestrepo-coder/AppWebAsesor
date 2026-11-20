@@ -1,0 +1,19 @@
+:root {
+  /* Paleta Oficial Fundación WWB Colombia */
+  --wwb-azul: #1D327D;
+  --wwb-azul-hover: #2b479d;
+  --wwb-amarillo: #F0AD15;
+  --wwb-amarillo-hover: #d99a0e;
+
+  /* Colores de Interfaz (Estilo Linear/Notion) */
+  --bg-app: #f4f6f9;
+  --bg-card: #ffffff;
+  --border-color: #e9ecef;
+  --text-main: #212529;
+  --text-muted: #6c757d;
+
+  /* Sombras y Bordes */
+  --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+  --border-radius-main: 0.5rem;
+  --sidebar-width: 280px;
+}
