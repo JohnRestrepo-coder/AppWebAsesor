@@ -30,6 +30,6 @@
 
 - [x] **0.4 Verificación, Compilación y Publicación:**
   - [x] Validar instalación y build del frontend (`npm run build`).
-  - [ ] Realizar commit atómico de los cambios en `feature/fase-0-saneamiento`.
-  - [ ] Publicar rama `feature/fase-0-saneamiento` en GitHub (`origin`).
-  - [ ] Preparar el Pull Request hacia `develop` para revisión.
+  - [x] Realizar commit atómico de los cambios en `feature/fase-0-saneamiento`.
+  - [x] Publicar rama `feature/fase-0-saneamiento` en GitHub (`origin`).
+  - [x] Preparar el Pull Request hacia `develop` para revisión.
