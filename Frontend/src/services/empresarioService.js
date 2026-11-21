@@ -9,6 +9,7 @@ export const EMPRESARIOS_MOCK = [
     nombre: "RAÚL HERNÁN ORTIZ BELTRÁN", 
     empresa: "Muebles Ortiz", 
     sector: "Madera y Muebles",
+    telefono: "3154567890",
     tiene_bitacora: true,
     archivo_bitacora: "Bitacora 80442045 RAUL HERNAN ORTIZ BELTRAN.xlsx" 
   },
@@ -18,6 +19,7 @@ export const EMPRESARIOS_MOCK = [
     nombre: "MARÍA ISABEL YEPES ASCENSIO", 
     empresa: "Confecciones El Sol", 
     sector: "Textil y Confección",
+    telefono: "3187654321",
     tiene_bitacora: true,
     archivo_bitacora: "Bitacora 29740252 MARIA ISABEL YEPES ASCENSIO.xlsx" 
   },
@@ -27,6 +29,7 @@ export const EMPRESARIOS_MOCK = [
     nombre: "STEFANNY BERNAL BENAVIDES", 
     empresa: "Detalles Stefanny", 
     sector: "Artesanías y Regalos",
+    telefono: "3123456789",
     tiene_bitacora: true,
     archivo_bitacora: "Bitacora 1007706965 STEFANNY BERNAL BENAVIDES.xlsx" 
   },
@@ -36,6 +39,7 @@ export const EMPRESARIOS_MOCK = [
     nombre: "LUZ EUGENIA PÉREZ PEÑA", 
     empresa: "Comercializadora Pérez", 
     sector: "Comercio Minorista",
+    telefono: "3169876543",
     tiene_bitacora: true,
     archivo_bitacora: "Bitacora 31880769 LUZ EUGENIA PEREZ PEÑA.xlsx" 
   },
@@ -45,6 +49,7 @@ export const EMPRESARIOS_MOCK = [
     nombre: "ASTRID NATALIA ARANDA PATIÑO", 
     empresa: "Estética Natalia", 
     sector: "Servicios y Belleza",
+    telefono: "3171122334",
     tiene_bitacora: true,
     archivo_bitacora: "Bitacora 1061777035 ASTRID NATALIA ARANDA PATIÑO.xlsx" 
   }
@@ -131,11 +136,18 @@ export const procesarMinutaVoz = async (empresarioId, textoDictado) => {
     }, { timeout: 15000 });
     return response.data;
   } catch (error) {
-    console.warn('⚠️ Error al procesar minuta en backend, usando generador de contingencia:', error.message);
+    console.warn('⚠️ Error al procesar minuta en backend, usando generador de contingencia con WhatsApp:', error.message);
+    const mockEmpresario = EMPRESARIOS_MOCK.find(e => e.id === String(empresarioId)) || EMPRESARIOS_MOCK[0];
+    const tel = mockEmpresario.telefono || "3154567890";
+
+    const msg1 = encodeURIComponent(`¡Hola! Te saluda tu consultor de la Fundación WWB Colombia. 👋\n\nTe comparto tu compromiso acordado:\n📌 *Registrar diariamente todas las ventas y compras en el cuaderno de trabajo.*\n\n📅 *Meta:* Próxima sesión.\n\n¡Muchos éxitos! 🚀`);
+    const msg2 = encodeURIComponent(`¡Hola! Te saluda tu consultor de la Fundación WWB Colombia. 👋\n\nTe comparto tu compromiso acordado:\n📌 *Separar físicamente el dinero de los gastos del hogar de las ventas del negocio.*\n\n📅 *Meta:* Próxima sesión.\n\n¡Muchos éxitos! 🚀`);
+
     return {
       empresario_id: String(empresarioId),
-      nombre_empresario: "Microempresario Activo",
-      resumen_sesion: `Resumen de sesión: Se identificaron oportunidades clave para ordenar los registros y separar el dinero personal de las ventas.`,
+      nombre_empresario: mockEmpresario.nombre,
+      telefono_empresario: tel,
+      resumen_sesion: `Resumen de sesión: Se identificaron oportunidades clave para ordenar los registros y separar el dinero personal de las ventas del negocio.`,
       tareas_consultor: [
         { 
           id: "c-1", 
@@ -158,21 +170,16 @@ export const procesarMinutaVoz = async (empresarioId, textoDictado) => {
           descripcion: "Registrar diariamente todas las ventas y compras en el cuaderno de trabajo.", 
           responsable: "empresario", 
           completada: false, 
-          fecha_limite: "Próxima sesión" 
+          fecha_limite: "Próxima sesión",
+          enlace_whatsapp: `https://wa.me/57${tel}?text=${msg1}`
         },
         { 
           id: "e-2", 
           descripcion: "Separar físicamente el dinero de los gastos del hogar de las ventas del negocio.", 
           responsable: "empresario", 
           completada: false, 
-          fecha_limite: "Próxima sesión" 
-        },
-        { 
-          id: "e-3", 
-          descripcion: "Hacer una lista de los 10 clientes más frecuentes con su número de teléfono.", 
-          responsable: "empresario", 
-          completada: false, 
-          fecha_limite: "Próxima sesión" 
+          fecha_limite: "Próxima sesión",
+          enlace_whatsapp: `https://wa.me/57${tel}?text=${msg2}`
         }
       ],
       status: "mock"

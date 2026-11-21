@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
 import { procesarMinutaVoz } from '../../services/empresarioService';
+import { abrirWhatsApp, generarEnlaceWhatsApp, construirMensajeWWB } from '../../utils/whatsappHelper';
 
 export default function MinutaVozModal({ empresario, isOpen, onClose }) {
   const {
@@ -47,6 +48,14 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
     setTareasEmpresario(prev => prev.map(t => t.id === id ? { ...t, completada: !t.completada } : t));
   };
 
+  const handleEnviarWhatsApp = (tarea) => {
+    const enlace = tarea.enlace_whatsapp || generarEnlaceWhatsApp(
+      empresario?.telefono || '3150000000',
+      construirMensajeWWB(empresario?.nombre, empresario?.empresa, tarea.descripcion)
+    );
+    abrirWhatsApp(enlace);
+  };
+
   return (
     <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
       <div className="modal-dialog modal-lg modal-dialog-scrollable">
@@ -59,7 +68,7 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
                 🎙️ Registro de Minuta de Asesoría por Voz
               </h5>
               <small className="opacity-75">
-                Fundación WWB Colombia · Asesoría con: <strong>{empresario?.nombre}</strong>
+                Fundación WWB Colombia · Asesoría con: <strong>{empresario?.nombre}</strong> (Tel: {empresario?.telefono || 'Sin celular'})
               </small>
             </div>
             <button type="button" className="btn-close btn-close-white" onClick={onClose} aria-label="Cerrar" />
@@ -68,7 +77,6 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
           {/* Body */}
           <div className="modal-body p-4 bg-light">
             
-            {/* Aviso si no soporta reconocimiento */}
             {!soportado && (
               <div className="alert alert-warning small py-2 mb-3">
                 ⚠️ Tu navegador actual no tiene activada la Web Speech API nativa. Puedes escribir o pegar tus notas manualmente en el campo inferior.
@@ -153,7 +161,7 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
               </div>
             </div>
 
-            {/* SECCIÓN 3: RESULTADOS CLASIFICADOS */}
+            {/* SECCIÓN 3: RESULTADOS CLASIFICADOS CON BOTONES WHATSAPP */}
             {minutaResultado && (
               <div className="card border-0 shadow-sm p-3 bg-white">
                 
@@ -201,7 +209,7 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
                     </div>
                   </div>
 
-                  {/* Tareas del Microempresario */}
+                  {/* Tareas del Microempresario con Botón WhatsApp */}
                   <div className="col-md-6">
                     <div className="p-3 rounded border h-100 bg-white">
                       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -214,7 +222,7 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
                       </div>
                       <div className="d-flex flex-column gap-2">
                         {tareasEmpresario.map((tarea) => (
-                          <div key={tarea.id} className="d-flex align-items-start justify-content-between gap-2 p-1 rounded hover-bg">
+                          <div key={tarea.id} className="d-flex align-items-start justify-content-between gap-2 p-2 rounded bg-light border">
                             <div className="form-check small flex-grow-1">
                               <input
                                 className="form-check-input"
@@ -230,13 +238,16 @@ export default function MinutaVozModal({ empresario, isOpen, onClose }) {
                                 {tarea.descripcion}
                               </label>
                             </div>
-                            <span 
-                              className="badge bg-success text-white py-1 px-2 text-nowrap" 
-                              style={{ fontSize: '0.65rem', cursor: 'default' }}
-                              title="Listo para WhatsApp en Fase 4"
+                            <button
+                              type="button"
+                              onClick={() => handleEnviarWhatsApp(tarea)}
+                              className="btn btn-success btn-sm py-1 px-2 text-nowrap d-flex align-items-center gap-1 rounded-pill shadow-none"
+                              style={{ fontSize: '0.68rem', backgroundColor: '#25D366', borderColor: '#25D366' }}
+                              title="Enviar recordatorio gratuito por WhatsApp"
                             >
-                              📲 WhatsApp
-                            </span>
+                              <span>💬</span>
+                              <span>WhatsApp</span>
+                            </button>
                           </div>
                         ))}
                       </div>

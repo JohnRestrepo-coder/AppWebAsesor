@@ -4,19 +4,22 @@ from app.models.minuta import MinutaVozRequest, MinutaVozResponse, TareaItem
 from app.services.gemini_service import gemini_service
 from app.services.prompt_service import prompt_service
 from app.services.data_pipeline_service import data_pipeline_service
+from app.services.whatsapp_service import whatsapp_service
 
 router = APIRouter(prefix="/api", tags=["Minutas y Tareas"])
 
 @router.post("/minuta-voz", response_model=MinutaVozResponse)
 async def procesar_minuta_voz(request: MinutaVozRequest):
     """
-    Recibe la transcripción de voz de la sesión de asesoría, la analiza con Gemini
-    y genera el resumen y las tareas separadas (Consultor vs Empresario).
+    Recibe la transcripción de voz de la sesión de asesoría, la analiza con Gemini,
+    genera el resumen y separa tareas, inyectando el enlace de WhatsApp pre-calculado
+    para cada compromiso del microempresario.
     """
     try:
         empresario = data_pipeline_service.obtener_empresario_por_id(request.empresario_id)
         nombre = empresario.nombre if empresario else f"Empresario {request.empresario_id}"
         empresa = empresario.empresa if empresario else "Microempresa Registrada"
+        telefono = getattr(empresario, "telefono", "3150000000") or "3150000000"
 
         prompt = prompt_service.build_voice_minute_prompt(
             nombre_empresario=nombre,
@@ -29,7 +32,7 @@ async def procesar_minuta_voz(request: MinutaVozRequest):
             nombre_empresario=nombre
         )
 
-        # Construir listas de TareaItem
+        # 1. Tareas del Consultor
         tareas_consultor = []
         for idx, desc in enumerate(datos_minuta.get("tareas_consultor", [])):
             tareas_consultor.append(TareaItem(
@@ -37,22 +40,35 @@ async def procesar_minuta_voz(request: MinutaVozRequest):
                 descripcion=str(desc),
                 responsable="consultor",
                 completada=False,
-                fecha_limite="Próxima sesión (7 días)"
+                fecha_limite="Próxima sesión (7 días)",
+                enlace_whatsapp=None
             ))
 
+        # 2. Tareas del Empresario con enlace directo wa.me
         tareas_empresario = []
         for idx, desc in enumerate(datos_minuta.get("tareas_empresario", [])):
+            texto_desc = str(desc)
+            mensaje_wa = whatsapp_service.construir_mensaje_recordatorio(
+                nombre_empresario=nombre,
+                empresa=empresa,
+                descripcion_tarea=texto_desc,
+                fecha_limite="la próxima asesoría"
+            )
+            enlace_wa = whatsapp_service.generar_enlace_wa(telefono, mensaje_wa)
+
             tareas_empresario.append(TareaItem(
                 id=f"te-{uuid.uuid4().hex[:6]}",
-                descripcion=str(desc),
+                descripcion=texto_desc,
                 responsable="empresario",
                 completada=False,
-                fecha_limite="En 7 días"
+                fecha_limite="En 7 días",
+                enlace_whatsapp=enlace_wa
             ))
 
         return MinutaVozResponse(
             empresario_id=request.empresario_id,
             nombre_empresario=nombre,
+            telefono_empresario=telefono,
             resumen_sesion=datos_minuta.get("resumen_sesion", "Sesión de asesoría completada."),
             tareas_consultor=tareas_consultor,
             tareas_empresario=tareas_empresario,

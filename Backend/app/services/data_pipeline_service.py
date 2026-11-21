@@ -15,6 +15,7 @@ EMPRESARIOS_CONTINGENCIA = [
         "nombre": "Raúl Hernán Ortiz Beltrán",
         "empresa": "Muebles Ortiz",
         "sector": "Madera y Muebles",
+        "telefono": "3154567890",
         "tiene_bitacora": True,
         "archivo_bitacora": "Bitacora 80442045 RAUL HERNAN ORTIZ BELTRAN.xlsx",
         "bitacora_file_id": "mock-drive-id-80442045"
@@ -25,6 +26,7 @@ EMPRESARIOS_CONTINGENCIA = [
         "nombre": "María Isabel Yepes Ascensio",
         "empresa": "Confecciones El Sol",
         "sector": "Textil y Confección",
+        "telefono": "3187654321",
         "tiene_bitacora": True,
         "archivo_bitacora": "Bitacora 29740252 MARIA ISABEL YEPES ASCENSIO.xlsx",
         "bitacora_file_id": "mock-drive-id-29740252"
@@ -35,6 +37,7 @@ EMPRESARIOS_CONTINGENCIA = [
         "nombre": "Stefanny Bernal Benavides",
         "empresa": "Detalles Stefanny",
         "sector": "Artesanías y Regalos",
+        "telefono": "3123456789",
         "tiene_bitacora": True,
         "archivo_bitacora": "Bitacora 1007706965 STEFANNY BERNAL BENAVIDES.xlsx",
         "bitacora_file_id": "mock-drive-id-1007706965"
@@ -45,6 +48,7 @@ EMPRESARIOS_CONTINGENCIA = [
         "nombre": "Luz Eugenia Pérez Peña",
         "empresa": "Comercializadora Pérez",
         "sector": "Comercio Minorista",
+        "telefono": "3169876543",
         "tiene_bitacora": True,
         "archivo_bitacora": "Bitacora 31880769 LUZ EUGENIA PEREZ PEÑA.xlsx",
         "bitacora_file_id": "mock-drive-id-31880769"
@@ -55,6 +59,7 @@ EMPRESARIOS_CONTINGENCIA = [
         "nombre": "Astrid Natalia Aranda Patiño",
         "empresa": "Estética Natalia",
         "sector": "Servicios y Belleza",
+        "telefono": "3171122334",
         "tiene_bitacora": True,
         "archivo_bitacora": "Bitacora 1061777035 ASTRID NATALIA ARANDA PATIÑO.xlsx",
         "bitacora_file_id": "mock-drive-id-1061777035"
@@ -126,6 +131,7 @@ class DataPipelineService:
                     nombre=emp["nombre"],
                     empresa=emp.get("empresa", "Microempresa Registrada"),
                     sector=emp.get("sector", "Por Definir"),
+                    telefono=emp.get("telefono", "3150000000"),
                     tiene_bitacora=tiene,
                     archivo_bitacora=info.get("nombre", None),
                     bitacora_file_id=info.get("id", None)
@@ -149,7 +155,6 @@ class DataPipelineService:
                 self._drive_status = "offline"
                 self._mensaje_status = f"Modo contingencia: {error_str[:120]}"
 
-            # Si ya teníamos caché previa, la mantenemos
             if self._cache_data is None:
                 self._cache_data = [EmpresarioResponse(**item) for item in EMPRESARIOS_CONTINGENCIA]
                 self._ultima_sync = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

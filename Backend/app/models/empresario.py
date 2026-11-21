@@ -7,6 +7,7 @@ class EmpresarioBase(BaseModel):
     nombre: str
     empresa: Optional[str] = "Sin Registro de Empresa"
     sector: Optional[str] = "Por Definir"
+    telefono: Optional[str] = "3150000000"
 
 class EmpresarioResponse(EmpresarioBase):
     tiene_bitacora: bool = False

@@ -7,6 +7,7 @@ class TareaItem(BaseModel):
     responsable: str  # "consultor" o "empresario"
     completada: bool = False
     fecha_limite: Optional[str] = "Próxima sesión (7 días)"
+    enlace_whatsapp: Optional[str] = None
 
 class MinutaVozRequest(BaseModel):
     empresario_id: str
@@ -15,6 +16,7 @@ class MinutaVozRequest(BaseModel):
 class MinutaVozResponse(BaseModel):
     empresario_id: str
     nombre_empresario: str
+    telefono_empresario: Optional[str] = None
     resumen_sesion: str
     tareas_consultor: List[TareaItem]
     tareas_empresario: List[TareaItem]

@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export default function EmpresarioCard({ empresario }) {
@@ -8,18 +7,21 @@ export default function EmpresarioCard({ empresario }) {
     <div className="wwb-card p-3 mb-3">
       <div className="d-flex justify-content-between align-items-start mb-2">
         <span className="badge text-dark" style={{ backgroundColor: 'var(--wwb-amarillo)', fontSize: '0.7rem' }}>
-          Empresario Activo
+          Expediente Activo
         </span>
         <small className="text-muted" style={{ fontSize: '0.75rem' }}>CC: {empresario.cedula}</small>
       </div>
       <h5 className="fw-bold mb-1" style={{ color: 'var(--wwb-azul)' }}>{empresario.nombre}</h5>
-      <p className="text-muted small mb-2">{empresario.negocio}</p>
+      <p className="text-muted small mb-2">{empresario.negocio || empresario.empresa}</p>
       <hr className="my-2" />
-      <div className="small text-secondary">
-        <strong>Sector:</strong> {empresario.sector}
+      <div className="small text-secondary d-flex flex-column gap-1">
+        <div><strong>Sector:</strong> {empresario.sector}</div>
+        <div>
+          <strong>Celular / WhatsApp:</strong> {empresario.telefono ? `+57 ${empresario.telefono}` : '315 000 0000'}
+        </div>
       </div>
       <div className="mt-2 p-2 bg-light rounded text-truncate border" style={{ fontSize: '0.7rem' }}>
-        📁 <code>{empresario.archivoOriginal}</code>
+        📁 <code>{empresario.archivoOriginal || empresario.archivo_bitacora || 'Sin bitácora vinculada'}</code>
       </div>
     </div>
   );
