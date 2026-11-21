@@ -5,6 +5,7 @@ import EmpresarioCard from './components/empresario/EmpresarioCard';
 import DiagnosticoCard from './components/empresario/DiagnosticoCard';
 import ProblematicasCard from './components/empresario/ProblematicasCard';
 import ChatPanel from './components/ia/ChatPanel';
+import MinutaVozModal from './components/minuta/MinutaVozModal';
 import { useEmpresarios } from './hooks/useEmpresarios';
 
 export default function App() {
@@ -24,12 +25,17 @@ export default function App() {
   } = useEmpresarios();
 
   const [seccionActiva, setSeccionActiva] = useState('empresarios');
+  const [modalMinutaAbierto, setModalMinutaAbierto] = useState(false);
 
   return (
     <div className="d-flex w-100" style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f4f6f9' }}>
       
       {/* 1. NAVEGACIÓN LATERAL (SIDEBAR) */}
-      <Sidebar seccionActiva={seccionActiva} onNavigate={setSeccionActiva} />
+      <Sidebar 
+        seccionActiva={seccionActiva} 
+        onNavigate={setSeccionActiva} 
+        onAbrirMinuta={() => setModalMinutaAbierto(true)}
+      />
 
       {/* 2. CONTENEDOR PRINCIPAL */}
       <div className="d-flex flex-column flex-grow-1" style={{ overflow: 'hidden' }}>
@@ -102,7 +108,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* ENCABEZADO DEL EXPEDIENTE ACTIVO */}
+              {/* ENCABEZADO DEL EXPEDIENTE ACTIVO CON BOTÓN DE MINUTA */}
               {empresarioActivo && (
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <div>
@@ -116,6 +122,14 @@ export default function App() {
                     </small>
                   </div>
                   <div className="d-flex align-items-center gap-2">
+                    <button
+                      onClick={() => setModalMinutaAbierto(true)}
+                      className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 rounded-pill px-3 shadow-sm"
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      <span>🎙️</span>
+                      <span>Minuta por Voz</span>
+                    </button>
                     <span className={`badge ${empresarioActivo.tiene_bitacora ? 'bg-success' : 'bg-secondary'}`}>
                       {empresarioActivo.tiene_bitacora ? 'Bitácora Disponible' : 'Pendiente de Bitácora'}
                     </span>
@@ -154,6 +168,14 @@ export default function App() {
 
         </main>
       </div>
+
+      {/* MODAL DE MINUTA DE VOZ */}
+      <MinutaVozModal
+        empresario={empresarioActivo}
+        isOpen={modalMinutaAbierto}
+        onClose={() => setModalMinutaAbierto(false)}
+      />
+
     </div>
   );
 }

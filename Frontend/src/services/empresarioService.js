@@ -122,3 +122,60 @@ export const consultarIA = async (empresarioId, pregunta, tipoAnalisis = "genera
     };
   }
 };
+
+export const procesarMinutaVoz = async (empresarioId, textoDictado) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/minuta-voz`, {
+      empresario_id: String(empresarioId),
+      texto_dictado: textoDictado
+    }, { timeout: 15000 });
+    return response.data;
+  } catch (error) {
+    console.warn('⚠️ Error al procesar minuta en backend, usando generador de contingencia:', error.message);
+    return {
+      empresario_id: String(empresarioId),
+      nombre_empresario: "Microempresario Activo",
+      resumen_sesion: `Resumen de sesión: Se identificaron oportunidades clave para ordenar los registros y separar el dinero personal de las ventas.`,
+      tareas_consultor: [
+        { 
+          id: "c-1", 
+          descripcion: "Revisar la hoja de cálculo de costos en la bitácora antes de la próxima asesoría.", 
+          responsable: "consultor", 
+          completada: false, 
+          fecha_limite: "En 7 días" 
+        },
+        { 
+          id: "c-2", 
+          descripcion: "Preparar formato de lista de difusión para clientes frecuentes.", 
+          responsable: "consultor", 
+          completada: false, 
+          fecha_limite: "En 7 días" 
+        }
+      ],
+      tareas_empresario: [
+        { 
+          id: "e-1", 
+          descripcion: "Registrar diariamente todas las ventas y compras en el cuaderno de trabajo.", 
+          responsable: "empresario", 
+          completada: false, 
+          fecha_limite: "Próxima sesión" 
+        },
+        { 
+          id: "e-2", 
+          descripcion: "Separar físicamente el dinero de los gastos del hogar de las ventas del negocio.", 
+          responsable: "empresario", 
+          completada: false, 
+          fecha_limite: "Próxima sesión" 
+        },
+        { 
+          id: "e-3", 
+          descripcion: "Hacer una lista de los 10 clientes más frecuentes con su número de teléfono.", 
+          responsable: "empresario", 
+          completada: false, 
+          fecha_limite: "Próxima sesión" 
+        }
+      ],
+      status: "mock"
+    };
+  }
+};

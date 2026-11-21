@@ -1,5 +1,7 @@
 import os
-from typing import Optional
+import json
+import re
+from typing import Optional, Dict, Any
 from app.services.prompt_service import prompt_service
 
 try:
@@ -48,8 +50,43 @@ class GeminiConsultantService:
             except Exception as e:
                 print(f"⚠️ Error en llamada a Gemini API ({e}). Usando motor de contingencia.")
 
-        # Respuesta de contingencia contextualizada según la metodología WWB
         return self._generar_respuesta_contingencia(nombre_empresario, tipo_analisis)
+
+    async def procesar_minuta_voz(self, prompt_minuta: str, nombre_empresario: str = "Empresario") -> Dict[str, Any]:
+        """
+        Procesa el dictado de voz de la sesión de consultoría y extrae
+        un JSON estructurado con el resumen y las tareas separadas.
+        """
+        if self.model:
+            try:
+                response = self.model.generate_content(prompt_minuta)
+                if response and response.text:
+                    texto = response.text.strip()
+                    # Limpiar posibles bloques ```json ... ```
+                    match = re.search(r'\{.*\}', texto, re.DOTALL)
+                    if match:
+                        return json.loads(match.group())
+            except Exception as e:
+                print(f"⚠️ Error procesando minuta con Gemini ({e}). Usando clasificador de contingencia.")
+
+        return self._generar_minuta_contingencia(nombre_empresario)
+
+    def _generar_minuta_contingencia(self, nombre_empresario: str) -> Dict[str, Any]:
+        return {
+            "resumen_sesion": (
+                f"Sesión de asesoría metodológica con {nombre_empresario}. "
+                "Se identificaron oportunidades para ordenar los registros diarios y fortalecer el canal de contacto con clientes."
+            ),
+            "tareas_consultor": [
+                f"Revisar la pestaña de costos en la bitácora de {nombre_empresario} antes de la próxima asesoría.",
+                "Estructurar un formato de catálogo rápido para compartir por WhatsApp."
+            ],
+            "tareas_empresario": [
+                "Llevar el registro diario de todas las entradas y salidas de dinero durante los próximos 7 días.",
+                "Separar físicamente el dinero de gastos del hogar de las ventas del negocio.",
+                "Hacer una lista de los 10 clientes más frecuentes con su número de teléfono."
+            ]
+        }
 
     def _generar_respuesta_contingencia(self, nombre_empresario: str, tipo_analisis: str) -> str:
         respuestas = {
